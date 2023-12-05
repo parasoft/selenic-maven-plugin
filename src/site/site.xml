@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.1 https://maven.apache.org/xsd/decoration-1.8.1.xsd"
+  name="Selenic Maven Plugin">
+  <bannerLeft>
+    <name>Parasoft</name>
+    <src>images/parasoft.svg</src>
+    <href>https://www.parasoft.com</href>
+  </bannerLeft>
+  <body>
+    <menu name="Overview">
+      <item name="Introduction" href="index.html"/>
+      <item name="Goals" href="plugin-info.html"/>
+      <item name="Usage" href="plugin-info.html#Usage"/>
+      <item name="FAQ" href="faq.html"/>
+    </menu>
+  </body>
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.12.0</version>
+  </skin>
+</project>

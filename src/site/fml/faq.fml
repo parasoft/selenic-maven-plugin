@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs xmlns="http://maven.apache.org/FML/1.0.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 https://maven.apache.org/xsd/fml-1.0.1.xsd"
+  title="Frequently Asked Questions"
+  toplink="false">
+  <part id="General">
+    <faq id="question">
+      <question>How do I install Maven 3.9 on Ubuntu?</question>
+      <answer>
+        <p>Ubuntu 22.04 LTS apt package manager still installs Maven 3.6.3.</p>
+        <p>You will need to download and install Maven 3.9 directly from Apache.</p>
+        <b>Remove the current version:</b>
+        <pre>sudo apt-get purge maven</pre>
+        <b>Download the latest version:</b>
+        <pre>wget https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+tar -xvf apache-maven-3.9.6-bin.tar.gz</pre>
+        <b>Installation:</b>
+        <pre>sudo cp -r apache-maven-3.9.6 /opt
+export PATH=/opt/apache-maven-3.9.6/bin:$PATH</pre>
+      </answer>
+    </faq>
+  </part>
+</faqs>
