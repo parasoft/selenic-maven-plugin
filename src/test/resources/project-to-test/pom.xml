@@ -16,7 +16,6 @@
         <groupId>com.parasoft</groupId>
         <artifactId>selenic-maven-plugin</artifactId>
         <configuration>
-            <selenicHome>parasoft/selenic</selenicHome>
         </configuration>
       </plugin>
     </plugins>
