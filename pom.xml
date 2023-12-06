@@ -52,6 +52,13 @@
       <organization>Parasoft</organization>
       <organizationUrl>https://www.parasoft.com</organizationUrl>
     </developer>
+    <developer>
+      <id>grigorbarseghyan</id>
+      <name>Grigor Barseghyan</name>
+      <email>grigorb@parasoft.com</email>
+      <organization>Parasoft</organization>
+      <organizationUrl>https://www.parasoft.com</organizationUrl>
+    </developer>
   </developers>
 
   <organization>

@@ -58,6 +58,28 @@ public class ImpactedTestsMojo extends AbstractMojo {
     @Parameter(property = "selenic.vmargs")
     private List<String> vmArgs;
 
+    /**
+     * Specifies the local file that contains binaries of the application under
+     * test (AUT). You can specify the path to a folder or a .war, .jar, .zip,
+     * or .ear file.
+     */
+    @Parameter(property = "selenic.app", required = true)
+    private File app;
+
+    /**
+     * Specifies the XML coverage report to use as the baseline.
+     */
+    @Parameter(property = "selenic.baseline", required = true)
+    private File baseline;
+
+    /**
+     * Specifies the path to the .properties file that includes custom
+     * configuration settings. Use the selenic.properties file in the Selenic
+     * home if not specified here.
+     */
+    @Parameter(property = "selenic.settings")
+    private File settings;
+
     @Override
     public void execute() throws MojoExecutionException {
         Log log = getLog();
@@ -70,13 +92,25 @@ public class ImpactedTestsMojo extends AbstractMojo {
         }
         Path covtoolJar = selenicHome.toPath().resolve("coverage").resolve("Java").resolve("jtestcov") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 .resolve("jtestcov.jar"); //$NON-NLS-1$
-        if (!Files.exists(covtoolJar)) {
-            throw new MojoExecutionException(Messages.get("covtool.missing", covtoolJar)); //$NON-NLS-1$
+        if (!baseline.exists()) {
+            throw new MojoExecutionException(Messages.get("baseline.missing", baseline.toString())); //$NON-NLS-1$
         }
-        runCovtoolJar(log, covtoolJar);
+        if (!app.exists()) {
+            throw new MojoExecutionException(Messages.get("app.missing", app.toString())); //$NON-NLS-1$
+        }
+        File settingsFile = settings;
+        if (settingsFile == null) {
+            Path settingsPath = selenicHome.toPath().resolve("selenic.properties"); //$NON-NLS-1$
+            if (Files.exists(settingsPath)) {
+                settingsFile = settingsPath.toFile();
+            }
+        } else if (!settingsFile.exists()) {
+            throw new MojoExecutionException(Messages.get("settings.missing", settingsFile.toString())); //$NON-NLS-1$
+        }
+        runCovtoolJar(log, covtoolJar, settingsFile);
     }
 
-    private void runCovtoolJar(Log log, Path covtoolJar) throws MojoExecutionException {
+    private void runCovtoolJar(Log log, Path covtoolJar, File settingsFile) throws MojoExecutionException {
         String osName = System.getProperty("os.name"); //$NON-NLS-1$
         boolean isWindows = osName != null && osName.startsWith("Windows"); //$NON-NLS-1$
         String javaExe = Paths.get(System.getProperty("java.home"), "bin", //$NON-NLS-1$ //$NON-NLS-2$
@@ -86,10 +120,12 @@ public class ImpactedTestsMojo extends AbstractMojo {
         if (vmArgs != null) {
             command.addAll(vmArgs);
         }
-        command.add("-jar"); //$NON-NLS-1$
-        command.add(covtoolJar.toAbsolutePath().toString());
+        addCommand("-jar", covtoolJar.toFile(), command); //$NON-NLS-1$
         command.add("impacted"); //$NON-NLS-1$
         command.add("-selenic"); //$NON-NLS-1$
+        addCommand("-app", app, command); //$NON-NLS-1$
+        addCommand("-baseline", baseline, command); //$NON-NLS-1$
+        addOptionalCommand("-settings", settingsFile, command); //$NON-NLS-1$
         runCommand(log, command);
     }
 
@@ -114,6 +150,17 @@ public class ImpactedTestsMojo extends AbstractMojo {
             }
         } catch (IOException e) {
             throw new MojoExecutionException(e);
+        }
+    }
+
+    private static void addCommand(String name, File value, List<String> command) {
+        command.add(name);
+        command.add(value.getAbsolutePath());
+    }
+
+    private static void addOptionalCommand(String name, File value, List<String> command) {
+        if (value != null) {
+            addCommand(name, value, command);
         }
     }
 }

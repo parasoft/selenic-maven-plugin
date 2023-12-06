@@ -16,6 +16,9 @@
         <groupId>com.parasoft</groupId>
         <artifactId>selenic-maven-plugin</artifactId>
         <configuration>
+            <app>${project.build.directory}/appfolder</app>
+            <baseline>${project.basedir}/baseline.xml</baseline>
+            <settings>${project.basedir}/settings.properties</settings>
         </configuration>
       </plugin>
     </plugins>

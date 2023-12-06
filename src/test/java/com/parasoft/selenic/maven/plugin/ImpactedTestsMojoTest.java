@@ -64,6 +64,7 @@ public class ImpactedTestsMojoTest {
         assertNotNull(impactedTestsMojo);
         List<String> command;
         Path mockSelenicInstallation = Files.createTempDirectory("selenic");
+        Path appFolder = Files.createDirectories(pom.toPath().resolve("target").resolve("appfolder"));
         try {
             Files.createFile(mockSelenicInstallation.resolve("selenic_agent.jar"));
             Files.createFile(mockSelenicInstallation.resolve("selenic_analyzer.jar"));
@@ -87,12 +88,18 @@ public class ImpactedTestsMojoTest {
                 stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
             }
         }
-        assertEquals(5, command.size());
+        assertEquals(11, command.size());
         assertThat(command.get(0), endsWith(Paths.get("bin", SystemUtils.IS_OS_WINDOWS ? "java.exe" : "java").toString()));
         assertEquals("-jar", command.get(1));
         assertThat(command.get(2), endsWith(Paths.get("coverage", "Java", "jtestcov", "jtestcov.jar").toString()));
         assertEquals("impacted", command.get(3));
         assertEquals("-selenic", command.get(4));
+        assertEquals("-app", command.get(5));
+        assertEquals(appFolder.toFile().getAbsolutePath(), command.get(6));
+        assertEquals("-baseline", command.get(7));
+        assertEquals(new File(pom, "baseline.xml").getAbsolutePath(), command.get(8));
+        assertEquals("-settings", command.get(9));
+        assertEquals(new File(pom, "settings.properties").getAbsolutePath(), command.get(10));
     }
 
     /** Do not need the MojoRule. */
