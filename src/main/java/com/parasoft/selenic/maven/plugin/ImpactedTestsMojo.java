@@ -27,6 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -80,6 +82,56 @@ public class ImpactedTestsMojo extends AbstractMojo {
     @Parameter(property = "selenic.settings")
     private File settings;
 
+    /**
+     * <p>
+     * Specifies patterns to include elements during AUT scanning. By default
+     * all elements are accepted. It matches fully qualified names of classes
+     * given in the form of ANT path patterns:
+     * </p>
+     *
+     * <pre><code>{@literal <includes>}
+     *   {@literal <include>}com/moduleone/**{@literal </include>}
+     *   {@literal <include>}com/moduletwo/runtime/*{@literal </include>}
+     * {@literal </includes>}</code></pre>
+     */
+    @Parameter(property = "selenic.includes")
+    private List<String> includes;
+
+    /**
+     * <p>
+     * Specifies patterns to exclude elements during AUT scanning. It matches
+     * fully qualified names of classes given in the form of ANT path patterns:
+     * </p>
+     *
+     * <pre><code>{@literal <excludes>}
+     *   {@literal <exclude>**}/*Logger{@literal </exclude>}
+     *   {@literal <exclude>}com/moduleone/**{@literal </exclude>}
+     * {@literal </excludes>}</code></pre>
+     */
+    @Parameter(property = "selenic.excludes")
+    private List<String> excludes;
+
+    /**
+     * <p>
+     * Allows you to configure settings directly. Settings passed with this
+     * parameter will overwrite those with the same key that are specified using
+     * the {@code settings} parameter. Example:
+     * </p>
+     *
+     * <pre><code>{@literal <properties>}
+     *   {@literal <report.dtp.publish>}true{@literal </report.dtp.publish>}
+     *   {@literal <console.verbosity.level>}high{@literal </console.verbosity.level>}
+     * {@literal </properties>}</code></pre>
+     */
+    @Parameter
+    private Map<String, String> properties;
+
+    /**
+     * Increases output verbosity.
+     */
+    @Parameter(property = "selenic.showdetails", defaultValue = "false")
+    private boolean showdetails; // parasoft-suppress OPT.CTLV "injected"
+
     @Override
     public void execute() throws MojoExecutionException {
         Log log = getLog();
@@ -126,6 +178,10 @@ public class ImpactedTestsMojo extends AbstractMojo {
         addCommand("-app", app, command); //$NON-NLS-1$
         addCommand("-baseline", baseline, command); //$NON-NLS-1$
         addOptionalCommand("-settings", settingsFile, command); //$NON-NLS-1$
+        addOptionalCommand("-include", includes, command); //$NON-NLS-1$
+        addOptionalCommand("-exclude", excludes, command); //$NON-NLS-1$
+        addOptionalCommand("-property", properties, command); //$NON-NLS-1$
+        addOptionalCommand("-showdetails", showdetails, command); //$NON-NLS-1$
         runCommand(log, command);
     }
 
@@ -161,6 +217,35 @@ public class ImpactedTestsMojo extends AbstractMojo {
     private static void addOptionalCommand(String name, File value, List<String> command) {
         if (value != null) {
             addCommand(name, value, command);
+        }
+    }
+
+    private static void addOptionalCommand(String name, String value, List<String> command) {
+        if (value != null && !value.trim().isEmpty()) {
+            command.add(name);
+            command.add(value);
+        }
+    }
+
+    private static void addOptionalCommand(String name, List<String> parameters, List<String> command) {
+        if (parameters != null) {
+            for (String parameter : parameters) {
+                addOptionalCommand(name, parameter, command);
+            }
+        }
+    }
+
+    private static void addOptionalCommand(String name, Map<String, String> parameters, List<String> command) {
+        if (parameters != null) {
+            for (Entry<String, String> entry : parameters.entrySet()) {
+                addOptionalCommand(name, entry.getKey() + '=' + entry.getValue(), command);
+            }
+        }
+    }
+
+    private static void addOptionalCommand(String name, boolean value, List<String> command) {
+        if (value) {
+            command.add(name);
         }
     }
 }

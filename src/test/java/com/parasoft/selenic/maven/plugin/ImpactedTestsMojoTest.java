@@ -17,6 +17,7 @@
 package com.parasoft.selenic.maven.plugin;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.endsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -88,7 +89,7 @@ public class ImpactedTestsMojoTest {
                 stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
             }
         }
-        assertEquals(11, command.size());
+        assertEquals(22, command.size());
         assertThat(command.get(0), endsWith(Paths.get("bin", SystemUtils.IS_OS_WINDOWS ? "java.exe" : "java").toString()));
         assertEquals("-jar", command.get(1));
         assertThat(command.get(2), endsWith(Paths.get("coverage", "Java", "jtestcov", "jtestcov.jar").toString()));
@@ -100,6 +101,13 @@ public class ImpactedTestsMojoTest {
         assertEquals(new File(pom, "baseline.xml").getAbsolutePath(), command.get(8));
         assertEquals("-settings", command.get(9));
         assertEquals(new File(pom, "settings.properties").getAbsolutePath(), command.get(10));
+        assertThat(command.subList(11, command.size()), contains(
+                "-include", "**/com/parasoft/**",
+                "-exclude", "**/.log",
+                "-exclude", "**/foo",
+                "-property", "console.verbosity.level=high",
+                "-property", "parasoft.eula.accepted=true",
+                "-showdetails"));
     }
 
     /** Do not need the MojoRule. */

@@ -19,6 +19,18 @@
             <app>${project.build.directory}/appfolder</app>
             <baseline>${project.basedir}/baseline.xml</baseline>
             <settings>${project.basedir}/settings.properties</settings>
+            <includes>
+                <include>**/com/parasoft/**</include>
+            </includes>
+            <excludes>
+                <exclude>**/.log</exclude>
+                <exclude>**/foo</exclude>
+            </excludes>
+            <properties>
+              <console.verbosity.level>high</console.verbosity.level>
+              <parasoft.eula.accepted>true</parasoft.eula.accepted>
+            </properties>
+            <showdetails>true</showdetails>
         </configuration>
       </plugin>
     </plugins>
