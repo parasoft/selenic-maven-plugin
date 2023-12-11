@@ -25,10 +25,14 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.stream.Stream;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -36,6 +40,8 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.surefire.api.testset.TestListResolver;
 
 /**
  * Scans an application and analyzes a baseline coverage report to execute unit
@@ -43,6 +49,9 @@ import org.apache.maven.plugins.annotations.Parameter;
  */
 @Mojo(name = "impacted-tests", defaultPhase = LifecyclePhase.PROCESS_TEST_CLASSES, threadSafe = true)
 public class ImpactedTestsMojo extends AbstractMojo {
+
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
+    private MavenProject project;
 
     /**
      * Specifies the location of the Parasoft Selenic installation.
@@ -159,10 +168,58 @@ public class ImpactedTestsMojo extends AbstractMojo {
         } else if (!settingsFile.exists()) {
             throw new MojoExecutionException(Messages.get("settings.missing", settingsFile.toString())); //$NON-NLS-1$
         }
-        runCovtoolJar(log, covtoolJar, settingsFile);
+        File targetDir = new File(project.getBuild().getDirectory());
+        Path covtoolPath = targetDir.toPath().resolve("covtool"); //$NON-NLS-1$
+        Path covtoolWorkDir = null;
+        try {
+            if (Files.exists(covtoolPath)) {
+                delete(covtoolPath);
+            }
+            covtoolWorkDir = Files.createDirectories(covtoolPath);
+        } catch (IOException e) {
+            log.debug(e);
+            throw new MojoExecutionException(e);
+        }
+        runCovtoolJar(log, covtoolJar, settingsFile, covtoolWorkDir.toFile());
+        applyImpactedTests(log, covtoolWorkDir);
     }
 
-    private void runCovtoolJar(Log log, Path covtoolJar, File settingsFile) throws MojoExecutionException {
+    private void applyImpactedTests(Log log, Path covtoolWorkDir) throws MojoExecutionException {
+        Path lstFile = covtoolWorkDir.resolve(".coverage").resolve("lsts").resolve("impacted_tests.lst"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        List<String> impactedTests;
+        if (Files.exists(lstFile)) {
+            try {
+                impactedTests = Files.readAllLines(lstFile);
+            } catch (IOException e) {
+                throw new MojoExecutionException(Messages.get("unable.to.read.lst.file", lstFile.toString()), e); //$NON-NLS-1$
+            }
+        } else {
+            impactedTests = Collections.emptyList();
+        }
+        Properties prop = project.getProperties();
+        String testsToRun;
+        if (impactedTests.isEmpty()) {
+            testsToRun = "!**/*";  //$NON-NLS-1$
+            prop.setProperty("surefire.failIfNoSpecifiedTests", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+            prop.setProperty("failsafe.failIfNoSpecifiedTests", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.debug("No impacted tests to run"); //$NON-NLS-1$
+        } else {
+            TestListResolver testListResolver = new TestListResolver(impactedTests);
+            testsToRun = testListResolver.getPluginParameterTest();
+            log.debug("Applying impacted tests to run: " + testsToRun); //$NON-NLS-1$
+        }
+        prop.setProperty("test", testsToRun); //$NON-NLS-1$
+        prop.setProperty("it.test", testsToRun); //$NON-NLS-1$
+    }
+
+    private static void delete(Path dir) throws IOException {
+        try (Stream<Path> stream = Files.walk(dir)) {
+            stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+        }
+    }
+
+    private void runCovtoolJar(Log log, Path covtoolJar, File settingsFile, File covtoolWorkDir)
+            throws MojoExecutionException {
         String osName = System.getProperty("os.name"); //$NON-NLS-1$
         boolean isWindows = osName != null && osName.startsWith("Windows"); //$NON-NLS-1$
         String javaExe = Paths.get(System.getProperty("java.home"), "bin", //$NON-NLS-1$ //$NON-NLS-2$
@@ -182,14 +239,15 @@ public class ImpactedTestsMojo extends AbstractMojo {
         addOptionalCommand("-exclude", excludes, command); //$NON-NLS-1$
         addOptionalCommand("-property", properties, command); //$NON-NLS-1$
         addOptionalCommand("-showdetails", showdetails, command); //$NON-NLS-1$
-        runCommand(log, command);
+        runCommand(log, command, covtoolWorkDir);
     }
 
-    private static void runCommand(Log log, List<String> command) throws MojoExecutionException {
+    private static void runCommand(Log log, List<String> command, File covtoolWorkDir) throws MojoExecutionException {
         if (log.isDebugEnabled()) {
             log.debug("command:" + lineSeparator() + String.join(lineSeparator(), command)); //$NON-NLS-1$
         }
         ProcessBuilder pb = new ProcessBuilder(command);
+        pb.directory(covtoolWorkDir);
         pb.inheritIO();
         try {
             Process process = pb.start();
