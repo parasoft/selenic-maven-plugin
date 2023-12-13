@@ -9,7 +9,7 @@
 
 ${project.name}
 
-  The Selenic Maven Plugin is a convenient way to integrate Parasoft Selenic as part of a Maven project lifecycle.  A licensed installation of Selenic on the same machine is required to be set in the {{{./impacted-tests-mojo.html#selenicHome}SELENIC_HOME}} environment variable, user property, or plugin configuration.  This plugin requires Java 8+ and Maven 3.9.
+  The Selenic Maven Plugin is a convenient way to integrate Parasoft Selenic as part of a Maven project lifecycle.  A licensed installation of Selenic on the same machine is required to be set in the {{{./impacted-tests-mojo.html#selenicHome}SELENIC_HOME}} environment variable, user property, or plugin configuration.  This plugin requires Java 11+ and Maven 3.9.
 
 * Goals Overview
 
