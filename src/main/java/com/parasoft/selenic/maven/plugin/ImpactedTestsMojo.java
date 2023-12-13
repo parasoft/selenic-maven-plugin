@@ -236,6 +236,10 @@ public class ImpactedTestsMojo extends AbstractMojo {
         addOptionalCommand("-settings", settingsFile, command); //$NON-NLS-1$
         addOptionalCommand("-include", includes, command); //$NON-NLS-1$
         addOptionalCommand("-exclude", excludes, command); //$NON-NLS-1$
+        if (!properties.containsKey("tia.test.format")) { //$NON-NLS-1$
+            command.add("-property"); //$NON-NLS-1$
+	    command.add("tia.test.format=junit"); //$NON-NLS-1$
+        }
         addOptionalCommand("-property", properties, command); //$NON-NLS-1$
         addOptionalCommand("-showdetails", showdetails, command); //$NON-NLS-1$
         runCommand(log, command, covtoolWorkDir);

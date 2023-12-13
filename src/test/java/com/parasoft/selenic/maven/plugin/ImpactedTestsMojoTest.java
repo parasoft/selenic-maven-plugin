@@ -89,7 +89,7 @@ public class ImpactedTestsMojoTest {
                 stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
             }
         }
-        assertEquals(22, command.size());
+        assertEquals(24, command.size());
         assertThat(command.get(0), endsWith(Paths.get("bin", SystemUtils.IS_OS_WINDOWS ? "java.exe" : "java").toString()));
         assertEquals("-jar", command.get(1));
         assertThat(command.get(2), endsWith(Paths.get("coverage", "Java", "jtestcov", "jtestcov.jar").toString()));
@@ -105,6 +105,7 @@ public class ImpactedTestsMojoTest {
                 "-include", "**/com/parasoft/**",
                 "-exclude", "**/.log",
                 "-exclude", "**/foo",
+                "-property", "tia.test.format=junit",
                 "-property", "console.verbosity.level=high",
                 "-property", "parasoft.eula.accepted=true",
                 "-showdetails"));
