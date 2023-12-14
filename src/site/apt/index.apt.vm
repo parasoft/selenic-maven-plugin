@@ -17,7 +17,7 @@ ${project.name}
 
   * {{{./help-mojo.html}selenic:help}} Display help information on selenic-maven-plugin.
 
-  Call <<<mvn com.parasoft:selenic-maven-plugin:help -Ddetail=true -Dgoal=selenic>>> to display parameter details.
+  Call <<<mvn com.parasoft:selenic-maven-plugin:help -Ddetail=true>>> to display parameter details.
 
   * {{{./impacted-tests-mojo.html}selenic:impacted-tests}} Scans an application and analyzes a baseline coverage report to execute unit tests impacted by code changes.
 
