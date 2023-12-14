@@ -169,18 +169,18 @@ public class ImpactedTestsMojo extends AbstractMojo {
             throw new MojoExecutionException(Messages.get("settings.missing", settingsFile.toString())); //$NON-NLS-1$
         }
         File targetDir = new File(project.getBuild().getDirectory());
-        Path covtoolPath = targetDir.toPath().resolve("covtool"); //$NON-NLS-1$
+        Path covtoolWorkDir = targetDir.toPath().resolve("covtool"); //$NON-NLS-1$
         try {
-            if (Files.exists(covtoolPath)) {
-                delete(covtoolPath);
+            if (Files.exists(covtoolWorkDir)) {
+                delete(covtoolWorkDir);
             }
-            Files.createDirectories(covtoolPath);
+            Files.createDirectories(covtoolWorkDir);
         } catch (IOException e) {
             log.debug(e);
             throw new MojoExecutionException(e);
         }
-        runCovtoolJar(log, covtoolJar, settingsFile, covtoolPath.toFile());
-        applyImpactedTests(log, covtoolPath);
+        runCovtoolJar(log, covtoolJar, settingsFile, covtoolWorkDir.toFile());
+        applyImpactedTests(log, covtoolWorkDir);
     }
 
     private void applyImpactedTests(Log log, Path covtoolWorkDir) throws MojoExecutionException {
