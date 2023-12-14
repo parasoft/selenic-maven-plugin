@@ -236,9 +236,8 @@ public class ImpactedTestsMojo extends AbstractMojo {
         addOptionalCommand("-settings", settingsFile, command); //$NON-NLS-1$
         addOptionalCommand("-include", includes, command); //$NON-NLS-1$
         addOptionalCommand("-exclude", excludes, command); //$NON-NLS-1$
-        if ((properties == null) || !properties.containsKey("tia.test.format")) { //$NON-NLS-1$
-            command.add("-property"); //$NON-NLS-1$
-            command.add("tia.test.format=junit"); //$NON-NLS-1$
+        if (properties == null || !properties.containsKey("tia.test.format")) { //$NON-NLS-1$
+            addCommand("-property", "tia.test.format=junit", command); //$NON-NLS-1$ //$NON-NLS-2$
         }
         addOptionalCommand("-property", properties, command); //$NON-NLS-1$
         addOptionalCommand("-showdetails", showdetails, command); //$NON-NLS-1$
@@ -270,9 +269,13 @@ public class ImpactedTestsMojo extends AbstractMojo {
         }
     }
 
-    private static void addCommand(String name, File value, List<String> command) {
+    private static void addCommand(String name, String value, List<String> command) {
         command.add(name);
-        command.add(value.getAbsolutePath());
+        command.add(value);
+    }
+
+    private static void addCommand(String name, File value, List<String> command) {
+        addCommand(name, value.getAbsolutePath(), command);
     }
 
     private static void addOptionalCommand(String name, File value, List<String> command) {
@@ -283,8 +286,7 @@ public class ImpactedTestsMojo extends AbstractMojo {
 
     private static void addOptionalCommand(String name, String value, List<String> command) {
         if (value != null && !value.trim().isEmpty()) {
-            command.add(name);
-            command.add(value);
+            addCommand(name, value, command);
         }
     }
 
