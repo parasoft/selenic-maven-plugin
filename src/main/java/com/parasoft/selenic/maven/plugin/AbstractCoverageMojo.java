@@ -116,8 +116,11 @@ public abstract class AbstractCoverageMojo extends AbstractSelenicMojo {
         Log log = getLog();
         Path covtoolJar = selenicHome.toPath().resolve("coverage").resolve("Java").resolve("jtestcov") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 .resolve("jtestcov.jar"); //$NON-NLS-1$
+        if (!Files.exists(covtoolJar)) {
+            throw new MojoExecutionException(Messages.get("covtool.missing", covtoolJar)); //$NON-NLS-1$
+        }
         if (!app.exists()) {
-            throw new MojoExecutionException(Messages.get("app.missing", app.toString())); //$NON-NLS-1$
+            throw new MojoExecutionException(Messages.get("app.missing", app)); //$NON-NLS-1$
         }
         File targetDir = new File(project.getBuild().getDirectory());
         Path covtoolWorkDir = targetDir.toPath().resolve("covtool"); //$NON-NLS-1$

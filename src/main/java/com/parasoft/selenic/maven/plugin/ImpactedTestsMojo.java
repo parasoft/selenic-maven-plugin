@@ -51,7 +51,7 @@ public class ImpactedTestsMojo extends AbstractCoverageMojo {
     @Override
     protected void addAdditionalArguments(List<String> command) throws MojoExecutionException {
         if (!baseline.exists()) {
-            throw new MojoExecutionException(Messages.get("baseline.missing", baseline.toString())); //$NON-NLS-1$
+            throw new MojoExecutionException(Messages.get("baseline.missing", baseline)); //$NON-NLS-1$
         }
         addCommand("-baseline", baseline, command); //$NON-NLS-1$
     }
@@ -64,7 +64,7 @@ public class ImpactedTestsMojo extends AbstractCoverageMojo {
             try {
                 impactedTests = Files.readAllLines(lstFile);
             } catch (IOException e) {
-                throw new MojoExecutionException(Messages.get("unable.to.read.lst.file", lstFile.toString()), e); //$NON-NLS-1$
+                throw new MojoExecutionException(Messages.get("unable.to.read.lst.file", lstFile), e); //$NON-NLS-1$
             }
         } else {
             impactedTests = Collections.emptyList();

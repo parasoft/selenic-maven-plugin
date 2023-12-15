@@ -60,7 +60,7 @@ public abstract class AbstractSelenicMojo extends AbstractMojo {
                 settingsFile = settingsPath.toFile();
             }
         } else if (!settingsFile.exists()) {
-            throw new MojoExecutionException(Messages.get("settings.missing", settingsFile.toString())); //$NON-NLS-1$
+            throw new MojoExecutionException(Messages.get("settings.missing", settingsFile)); //$NON-NLS-1$
         }
         doExecute(settingsFile);
     }
