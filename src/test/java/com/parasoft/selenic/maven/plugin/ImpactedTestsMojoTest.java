@@ -17,7 +17,6 @@
 package com.parasoft.selenic.maven.plugin;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.endsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -95,20 +94,25 @@ public class ImpactedTestsMojoTest {
         assertThat(command.get(2), endsWith(Paths.get("coverage", "Java", "jtestcov", "jtestcov.jar").toString()));
         assertEquals("impacted", command.get(3));
         assertEquals("-selenic", command.get(4));
-        assertEquals("-app", command.get(5));
-        assertEquals(appFolder.toFile().getAbsolutePath(), command.get(6));
-        assertEquals("-baseline", command.get(7));
-        assertEquals(new File(pom, "baseline.xml").getAbsolutePath(), command.get(8));
-        assertEquals("-settings", command.get(9));
-        assertEquals(new File(pom, "settings.properties").getAbsolutePath(), command.get(10));
-        assertThat(command.subList(11, command.size()), contains(
-                "-include", "**/com/parasoft/**",
-                "-exclude", "**/.log",
-                "-exclude", "**/foo",
-                "-property", "tia.test.format=junit",
-                "-property", "console.verbosity.level=high",
-                "-property", "parasoft.eula.accepted=true",
-                "-showdetails"));
+        assertEquals("-settings", command.get(5));
+        assertEquals(new File(pom, "settings.properties").getAbsolutePath(), command.get(6));
+        assertEquals("-property", command.get(7));
+        assertEquals("console.verbosity.level=high", command.get(8));
+        assertEquals("-property", command.get(9));
+        assertEquals("parasoft.eula.accepted=true", command.get(10));
+        assertEquals("-property", command.get(11));
+        assertEquals("tia.test.format=junit", command.get(12));
+        assertEquals("-showdetails", command.get(13));
+        assertEquals("-app", command.get(14));
+        assertEquals(appFolder.toFile().getAbsolutePath(), command.get(15));
+        assertEquals("-include", command.get(16));
+        assertEquals("**/com/parasoft/**", command.get(17));
+        assertEquals("-exclude", command.get(18));
+        assertEquals("**/.log", command.get(19));
+        assertEquals("-exclude", command.get(20));
+        assertEquals("**/foo", command.get(21));
+        assertEquals("-baseline", command.get(22));
+        assertEquals(new File(pom, "baseline.xml").getAbsolutePath(), command.get(23));
     }
 
     /** Do not need the MojoRule. */
