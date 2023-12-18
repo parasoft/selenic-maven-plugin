@@ -88,7 +88,7 @@ public abstract class AbstractCoverageMojo extends AbstractSelenicMojo {
      *   {@literal <include>}com/moduletwo/runtime/*{@literal </include>}
      * {@literal </includes>}</code></pre>
      */
-    @Parameter(property = "selenic.coverage.binaries.include")
+    @Parameter(property = "selenic.coverage.binaries.includes")
     private List<String> includes;
 
     /**
@@ -102,7 +102,7 @@ public abstract class AbstractCoverageMojo extends AbstractSelenicMojo {
      *   {@literal <exclude>}com/moduleone/**{@literal </exclude>}
      * {@literal </excludes>}</code></pre>
      */
-    @Parameter(property = "selenic.coverage.binaries.exclude")
+    @Parameter(property = "selenic.coverage.binaries.excludes")
     private List<String> excludes;
 
     private final String coverageCommand;
